@@ -40,5 +40,6 @@ namespace BigSchool.Models
 
         //add List Category
         public List<Category> ListCategory = new List<Category>();
+        public int Status { get; set; }
     }
 }
