@@ -1,0 +1,149 @@
+﻿@model IEnumerable<BigSchool.Models.Course>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row">
+
+    <ul class="course">
+        @foreach (var course in Model)
+        {
+            <li>
+                 <div class="date">
+                         <div class="month">
+                            @course.Datetime.ToString("MM")
+                        </div>
+                        <div class="day">
+                            @course.Datetime.ToString("dd")
+
+                        </div>
+                 </div>
+                 <div class="details">
+                     <span class="lecture">
+                         @course.Name
+                         @if (course.isLogin)
+                         {
+                             if (course.isShowFollow)
+                             {
+                                 <button data-user-id="@course.LecturerId" class="btn btn-default btn-sm js-tongle-follow">Follow</button>
+                             }
+                             else
+                             {
+                                 <button data-user-id="@course.LecturerId" class="btn btn-success btn-sm js-tongle-follow">Following</button>
+                             }
+
+                         }
+                         <button data-user-id="@course.LecturerId" class="btn btn-default btn-sm js-tongle-follow">Follow</button>
+                     </span>
+                     <br />
+                     <span class="category">
+                         @course.Category.Name
+                         @if (course.isLogin)
+                         {
+                             if (course.isShowGoing)
+                             {
+                                 <button data-course-id="@course.Id" class="btn btn-default btn-sm js-tongle-attendance">Going?</button>
+                             }
+                             else
+                             {
+                                 <button data-course-id="@course.Id" class="btn btn-info btn-sm js-tongle-attendance">Going</button>
+                             }
+                         }
+                         <button data-course-id="@course.Id" class="btn btn-default btn-sm js-tongle-attendance">Going?</button>
+                     </span>
+                 </div>
+            @*@ @course.Datetime.ToString("dd/MM/yyyy HH:mm") - @course.Name - @course.Category.Name*@
+            </li>
+        }
+    </ul>
+
+    @section scripts {
+    <script>
+        $(document).ready(function () {
+            $(".js-tongle-attendance").click(function (e) {
+                var button = $(e.target);
+                $.post("/api/attendances", { Id: button.attr("data-course-id") })
+                    .done(function (result) {
+                        @*alert("Register course sucessfully!")
+                        button
+                            .removeClass("btn-default")
+                            .addClass("btn-info")
+                            .text("Going");*@
+                        if (result == "cancel") {
+
+                            alert("Cancel register course sucessfully!")
+                            button
+                                .removeClass("btn-info")
+                                .addClass("btn-default")
+                                .text("Going?");
+                        } else {
+                            alert("Register course sucessfully!")
+                            button
+                                .removeClass("btn-default")
+                                .addClass("btn-info")
+                                .text("Going");
+                        }
+                    }).fail(function () {
+                        alert("Something fail");
+                    });
+            });
+            $(".js-tongle-follow").click(function (e) {
+                var button = $(e.target);
+                var followee = button.attr("data-user-id");
+                $.post("/api/followings", { FolloweeId: button.attr("data-user-id") })
+                    .done(function (result) {
+                        if (result == "cancel") {
+                            $('.js-tongle-follow').each(function (i, obj) {
+                                if ($(this).attr('data-user-id') == followee) {
+                                    $(this).removeClass("btn-success")
+                                        .addClass("btn-default")
+                                        .text("Follow");
+                                }
+                            });
+                            alert("unFollow sucessfully")
+                        } else {
+                            $('.js-tongle-follow').each(function (i, obj) {
+                                if ($(this).attr('data-user-id') == followee) {
+                                    $(this).removeClass("btn-default")
+                                        .addClass("btn-success")
+                                        .text("Following");
+                                }
+                            });
+                            alert("Follow sucessfully")
+                        }
+                        
+                    }).fail(function () {
+                        alert("Something fail");
+                    });
+            });
+        });
+    </script>}
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+            enables a clean separation of concerns and gives you full control over markup
+            for enjoyable, agile development.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    </div>
+
+</div>
